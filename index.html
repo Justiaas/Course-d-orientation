@@ -266,6 +266,22 @@
       margin: 12px 0;
     }
 
+    .live-box {
+      background: #ecfdf5;
+      border-left: 5px solid #22c55e;
+      border-radius: 14px;
+      padding: 12px;
+      margin: 12px 0;
+      color: #14532d;
+      font-weight: bold;
+    }
+
+    .live-box.attente {
+      background: #fff7ed;
+      border-left-color: #f97316;
+      color: #9a3412;
+    }
+
     .success {
       color: #047857;
       font-weight: bold;
@@ -403,11 +419,17 @@
       </div>
     </section>
 
+    <section id="statutReference" class="card">
+      <div id="messageLive" class="live-box attente">
+        Connexion à la base en direct... Si le professeur n’a pas encore enregistré le meilleur temps, le calcul restera bloqué.
+      </div>
+    </section>
+
     <section id="espaceProfesseur" class="card teacher-card hidden">
       <h2>Espace professeur</h2>
       <p class="subtitle">
         Renseigne ici le temps minimal réalisé par l’élève de référence.
-        Ce temps servira de base pour calculer la note de temps des autres élèves.
+        Ce temps sera envoyé automatiquement sur tous les appareils connectés au site.
       </p>
 
       <div class="formula">
@@ -432,11 +454,8 @@
         </div>
       </div>
 
-      <p class="subtitle">
-        Exemple : si Justine réalise le meilleur temps en 8 min, alors le temps de chaque élève est comparé à 8 min.
-      </p>
-
-      <button onclick="enregistrerTempsReference()">Enregistrer le temps de référence</button>
+      <button onclick="enregistrerTempsReference()">Enregistrer le temps de référence en direct</button>
+      <button class="secondary" onclick="effacerTempsReference()">Effacer le temps de référence</button>
       <button class="secondary" onclick="retourEspaceEleve()">Retour à l’espace élève</button>
       <p id="messageReference" class="warning">Aucun meilleur temps n’est encore enregistré.</p>
     </section>
@@ -565,9 +584,7 @@
               Ne revient pas au point de rencontre à temps.
               <span class="fourchette">1 pt /3</span>
             </td>
-            <td>
-              —
-            </td>
+            <td>—</td>
             <td>
               <span class="niveau-tableau">Responsable</span>
               Respecte les règles de sécurité pendant toute l’épreuve.
@@ -601,8 +618,31 @@
     </section>
   </main>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDVW62wsuqKnXdtXt5s1i6RKFervu_L57M",
+      authDomain: "course-d-orientation-6eme.firebaseapp.com",
+      databaseURL: "https://course-d-orientation-6eme-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "course-d-orientation-6eme",
+      storageBucket: "course-d-orientation-6eme.firebasestorage.app",
+      messagingSenderId: "1016494285059",
+      appId: "1:1016494285059:web:9b995434dcd89a7d150936",
+      measurementId: "G-Z2SJ2936KW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const referenceTemps = ref(database, "evaluationCourseOrientation/tempsReference");
+
     let tempsReferenceEnregistre = false;
+    let tempsReference = {
+      eleve: "Justine",
+      minutes: 0,
+      secondes: 0
+    };
 
     const eleves = [
       { prenom: "Justine", parcours: "Référence temps", vague: "Professeur" },
@@ -642,6 +682,48 @@
       const cible = normaliserTexte(prenom);
       if (!cible) return null;
       return eleves.find(eleve => normaliserTexte(eleve.prenom) === cible) || null;
+    }
+
+    function ecouterTempsReference() {
+      onValue(referenceTemps, function(snapshot) {
+        const data = snapshot.val();
+
+        if (data && Number(data.minutes) * 60 + Number(data.secondes) > 0) {
+          tempsReferenceEnregistre = true;
+          tempsReference = {
+            eleve: data.eleve || "Justine",
+            minutes: Number(data.minutes || 0),
+            secondes: Number(data.secondes || 0)
+          };
+
+          document.getElementById("eleveReferenceTemps").value = tempsReference.eleve;
+          document.getElementById("meilleurTempsMinutes").value = tempsReference.minutes;
+          document.getElementById("meilleurTempsSecondes").value = tempsReference.secondes;
+
+          document.getElementById("messageLive").textContent = `Meilleur temps chargé en direct : ${tempsReference.eleve}, ${tempsReference.minutes} min ${String(tempsReference.secondes).padStart(2, "0")} s. Les élèves peuvent calculer leur résultat.`;
+          document.getElementById("messageLive").className = "live-box";
+
+          document.getElementById("messageReference").textContent = `Temps actuellement enregistré : ${tempsReference.eleve}, ${tempsReference.minutes} min ${String(tempsReference.secondes).padStart(2, "0")} s.`;
+          document.getElementById("messageReference").className = "success";
+        } else {
+          tempsReferenceEnregistre = false;
+          tempsReference = {
+            eleve: "Justine",
+            minutes: 0,
+            secondes: 0
+          };
+
+          document.getElementById("messageLive").textContent = "Aucun meilleur temps n’est encore enregistré. Le calcul des résultats est bloqué jusqu’à l’enregistrement par le professeur.";
+          document.getElementById("messageLive").className = "live-box attente";
+
+          document.getElementById("messageReference").textContent = "Aucun meilleur temps n’est encore enregistré.";
+          document.getElementById("messageReference").className = "warning";
+        }
+      }, function(error) {
+        document.getElementById("messageLive").textContent = "Erreur de connexion Firebase : vérifie que la Realtime Database est bien créée et en mode test.";
+        document.getElementById("messageLive").className = "live-box attente";
+        console.error(error);
+      });
     }
 
     function verifierPrenom() {
@@ -706,18 +788,41 @@
       const minutes = Number(document.getElementById("meilleurTempsMinutes").value || 0);
       const secondes = Number(document.getElementById("meilleurTempsSecondes").value || 0);
       const eleveReference = document.getElementById("eleveReferenceTemps").value || "Justine";
-      const message = document.getElementById("messageReference");
+      const totalSecondes = minutes * 60 + secondes;
 
-      if (minutes <= 0 && secondes <= 0) {
-        tempsReferenceEnregistre = false;
-        message.textContent = "Le meilleur temps n’est pas valide. Renseigne un temps supérieur à 0.";
-        message.className = "warning";
+      if (totalSecondes <= 0) {
+        alert("Le meilleur temps n’est pas valide. Renseigne un temps supérieur à 0.");
         return;
       }
 
-      tempsReferenceEnregistre = true;
-      message.textContent = `Temps de référence enregistré : ${eleveReference}, ${minutes} min ${String(secondes).padStart(2, "0")} s.`;
-      message.className = "success";
+      set(referenceTemps, {
+        eleve: eleveReference,
+        minutes: minutes,
+        secondes: secondes,
+        totalSecondes: totalSecondes,
+        misAJourLe: new Date().toISOString()
+      })
+      .then(function() {
+        alert("Temps de référence enregistré en direct. Les élèves connectés peuvent maintenant calculer leur résultat.");
+      })
+      .catch(function(error) {
+        alert("Erreur : impossible d’enregistrer le temps. Vérifie les règles de la base Firebase.");
+        console.error(error);
+      });
+    }
+
+    function effacerTempsReference() {
+      const confirmation = confirm("Effacer le temps de référence ? Les élèves ne pourront plus calculer tant qu’un nouveau temps n’est pas enregistré.");
+      if (!confirmation) return;
+
+      remove(referenceTemps)
+        .then(function() {
+          alert("Temps de référence effacé.");
+        })
+        .catch(function(error) {
+          alert("Erreur : impossible d’effacer le temps.");
+          console.error(error);
+        });
     }
 
     function calculPointsTemps(totalSecondes, meilleurTempsSecondes) {
@@ -787,7 +892,7 @@
       if (!tempsReferenceEnregistre) {
         document.getElementById("resultat").innerHTML = `
           <p class="warning">
-            Le résultat ne peut pas être calculé : le professeur doit d’abord entrer et enregistrer le meilleur temps dans l’espace professeur.
+            Le résultat ne peut pas être calculé : le professeur doit d’abord enregistrer le meilleur temps. La mise à jour se fera automatiquement ensuite.
           </p>
         `;
         document.getElementById("conseilCard").classList.add("hidden");
@@ -801,9 +906,9 @@
       const secondes = Number(document.getElementById("secondes").value || 0);
       const securite = Number(document.getElementById("securite").value || 0);
 
-      const eleveReferenceTemps = document.getElementById("eleveReferenceTemps").value || "Justine";
-      const meilleurMinutes = Number(document.getElementById("meilleurTempsMinutes").value || 0);
-      const meilleurSecondes = Number(document.getElementById("meilleurTempsSecondes").value || 0);
+      const meilleurMinutes = tempsReference.minutes;
+      const meilleurSecondes = tempsReference.secondes;
+      const eleveReferenceTemps = tempsReference.eleve;
 
       const totalSecondes = minutes * 60 + secondes;
       const meilleurTempsSecondes = meilleurMinutes * 60 + meilleurSecondes;
@@ -873,6 +978,16 @@
         tableau.scrollIntoView({ behavior: "smooth" });
       }
     }
+
+    window.verifierPrenom = verifierPrenom;
+    window.demanderMotDePasseProfesseur = demanderMotDePasseProfesseur;
+    window.enregistrerTempsReference = enregistrerTempsReference;
+    window.effacerTempsReference = effacerTempsReference;
+    window.retourEspaceEleve = retourEspaceEleve;
+    window.calculerResultat = calculerResultat;
+    window.afficherTableauEvaluation = afficherTableauEvaluation;
+
+    ecouterTempsReference();
   </script>
 </body>
 </html>
