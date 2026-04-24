@@ -1,170 +1,878 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculateur CO - 6ème</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #2e7d32; /* Vert forêt */
-            --secondary: #ffa000; /* Orange balise */
-            --bg: #f4f7f6;
-        }
-        body {
-            font-family: 'Fredoka', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            background: white;
-            width: 90%;
-            max-width: 450px;
-            padding: 30px;
-            border-radius: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border-top: 8px solid var(--secondary);
-        }
-        h1 { color: var(--primary); text-align: center; margin-bottom: 25px; }
-        
-        .section { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 10px; font-weight: 600; color: #444; }
-        
-        input, select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-            font-family: 'Fredoka', sans-serif;
-        }
-        input:focus { border-color: var(--secondary); outline: none; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Évaluation course d’orientation</title>
 
-        button {
-            width: 100%;
-            padding: 18px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
-            transition: all 0.2s;
-        }
-        button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 125, 50, 0.4); }
-
-        #result {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 15px;
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .note-cercle {
-            width: 80px;
-            height: 80px;
-            background: var(--secondary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin: 0 auto 15px;
-            font-weight: bold;
-            border: 4px solid #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .profil-titre { font-size: 1.3rem; color: var(--primary); margin-bottom: 10px; font-weight: 600; }
-        .conseil-texte { color: #666; line-height: 1.4; font-size: 0.95rem; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>🏃‍♂️ Score CO</h1>
-
-    <div class="section">
-        <label>Combien de balises trouvées ? [cite: 3]</label>
-        <input type="number" id="balises" min="0" max="14" placeholder="Tape ton nombre (max 14)...">
-    </div>
-
-    <div class="section">
-        <label>Ton rythme de course : [cite: 6]</label>
-        <select id="temps">
-            <option value="1">🐢 Le Régulier (Lent)</option>
-            <option value="2">🏃 L'Efficace (Moyen)</option>
-            <option value="3">⚡ Le Rapide (Vite)</option>
-        </select>
-    </div>
-
-    <div class="section">
-        <label>Sécurité & Horaire : [cite: 8]</label>
-        <select id="securite">
-            <option value="3">✅ Le Responsable (Parfait)</option>
-            <option value="1">⚠️ À rappeler (Oubli/Retard)</option>
-        </select>
-    </div>
-
-    <button onclick="calculer()">Voir mon résultat</button>
-
-    <div id="result">
-        <div class="note-cercle" id="laNote"></div>
-        <div class="profil-titre" id="leProfil"></div>
-        <div class="conseil-texte" id="leConseil"></div>
-    </div>
-</div>
-
-<script>
-function calculer() {
-    let b = parseInt(document.getElementById('balises').value) || 0;
-    let t = parseInt(document.getElementById('temps').value);
-    let s = parseInt(document.getElementById('securite').value);
-
-    if(b > 14) b = 14;
-
-    // Calcul de la note totale (Max 14 + 3 + 3 = 20) [cite: 5, 7, 9]
-    let total = b + t + s;
-
-    let profil = "";
-    let conseil = "";
-    let couleur = "";
-
-    // Logique basée sur les niveaux du document 
-    if (b >= 11) {
-        profil = "Niveau 3 : L'Orienteur 🧭";
-        conseil = "Génial ! Tu maîtrises ton sujet. Pour la prochaine fois, essaie d'augmenter ta vitesse de course entre les balises.";
-        couleur = "#e8f5e9";
-    } else if (b >= 6) {
-        profil = "Niveau 2 : L'Explorateur 🗺️";
-        conseil = "Beau travail ! Tu te repères bien. Travaille ta prise de décision pour moins hésiter aux carrefours.";
-        couleur = "#fff3e0";
-    } else {
-        profil = "Niveau 1 : Le Chercheur 🔍";
-        conseil = "N'oublie pas d'orienter ta carte à chaque changement de direction. Utilise les éléments remarquables !";
-        couleur = "#ffebee";
+  <style>
+    * {
+      box-sizing: border-box;
     }
 
-    const resDiv = document.getElementById('result');
-    resDiv.style.display = 'block';
-    resDiv.style.backgroundColor = couleur;
-    
-    document.getElementById('laNote').innerText = total + "/20";
-    document.getElementById('leProfil').innerText = profil;
-    document.getElementById('leConseil').innerText = conseil;
-    
-    resDiv.scrollIntoView({ behavior: 'smooth' });
-}
-</script>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 45%, #fef3c7 100%);
+      color: #0f172a;
+    }
 
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.94);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #2563eb, #16a34a);
+      color: white;
+      border: none;
+    }
+
+    .hero .subtitle {
+      color: #e0f2fe;
+    }
+
+    .teacher-card {
+      background: linear-gradient(135deg, #fff7ed, #fffbeb);
+      border: 2px solid #fdba74;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 24px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      line-height: 1.5;
+    }
+
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid #cbd5e1;
+      font-size: 16px;
+      margin-bottom: 14px;
+      background: white;
+    }
+
+    button {
+      border: none;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2563eb, #16a34a);
+      color: white;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      margin: 4px 4px 4px 0;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+    }
+
+    button.secondary {
+      background: white;
+      color: #0f172a;
+      border: 1px solid #bfdbfe;
+    }
+
+    .bouton-tableau {
+      width: 100%;
+      margin-top: 12px;
+      background: linear-gradient(135deg, #7c3aed, #2563eb);
+    }
+
+    .result-note {
+      font-size: 52px;
+      font-weight: bold;
+      margin: 8px 0;
+    }
+
+    .small-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
+      min-width: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      word-break: normal;
+      overflow-wrap: normal;
+      hyphens: none;
+    }
+
+    .small-card.blue {
+      background: #eff6ff;
+      border-color: #93c5fd;
+    }
+
+    .small-card.green {
+      background: #ecfdf5;
+      border-color: #86efac;
+    }
+
+    .small-card.orange {
+      background: #fff7ed;
+      border-color: #fdba74;
+    }
+
+    .small-card p {
+      font-size: 13px;
+      margin: 6px 0;
+      line-height: 1.45;
+    }
+
+    .small-card strong {
+      font-size: 15px;
+    }
+
+    .titre-partie {
+      display: block;
+      font-size: 14px;
+      font-weight: 900;
+      color: #0f172a;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+
+    .profil-eleve {
+      display: block;
+      font-size: 16px;
+      font-weight: 900;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      line-height: 1.2;
+      word-break: normal;
+      overflow-wrap: normal;
+    }
+
+    .profil-temps {
+      display: block;
+      font-size: 16px;
+      font-weight: 900;
+      color: #166534;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .profil-comportement {
+      display: block;
+      font-size: 16px;
+      font-weight: 900;
+      color: #9a3412;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .profil-description {
+      font-size: 12px;
+      font-weight: bold;
+      color: #334155;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .badge {
+      display: inline-block;
+      width: fit-content;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: bold;
+      background: #dbeafe;
+      color: #1d4ed8;
+      margin-bottom: 8px;
+    }
+
+    .progress {
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: auto;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #2563eb, #22c55e);
+    }
+
+    .formula {
+      background: #fefce8;
+      border-left: 5px solid #f59e0b;
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 14px;
+      color: #713f12;
+      margin: 12px 0;
+    }
+
+    .success {
+      color: #047857;
+      font-weight: bold;
+    }
+
+    .warning {
+      color: #b45309;
+      font-weight: bold;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .teacher-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .evaluation-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 12px;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .evaluation-table th {
+      background: #1e3a8a;
+      color: white;
+      font-weight: 900;
+      padding: 12px;
+      text-align: left;
+    }
+
+    .evaluation-table th:first-child {
+      border-radius: 14px 0 0 14px;
+    }
+
+    .evaluation-table th:last-child {
+      border-radius: 0 14px 14px 0;
+    }
+
+    .evaluation-table td {
+      background: white;
+      border-top: 1px solid #cbd5e1;
+      border-bottom: 1px solid #cbd5e1;
+      padding: 14px;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.45;
+    }
+
+    .evaluation-table td:first-child {
+      border-left: 1px solid #cbd5e1;
+      border-radius: 16px 0 0 16px;
+      background: #eff6ff;
+      font-weight: bold;
+    }
+
+    .evaluation-table td:last-child {
+      border-right: 1px solid #cbd5e1;
+      border-radius: 0 16px 16px 0;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    .niveau-tableau {
+      display: block;
+      font-size: 16px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: #0f172a;
+    }
+
+    .fourchette {
+      display: block;
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: #f1f5f9;
+      border-radius: 12px;
+      font-weight: 900;
+      color: #334155;
+      text-align: center;
+    }
+
+    .tableau-aide {
+      background: #ecfdf5;
+      border-left: 5px solid #22c55e;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 10px;
+      color: #14532d;
+      font-weight: bold;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .titre-partie {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <section class="card hero">
+      <div class="teacher-header">
+        <div>
+          <p class="subtitle">EPS · 6e</p>
+          <h1>Retour d’évaluation blanche</h1>
+          <p class="subtitle">
+            Entre ton prénom, ton nombre de balises et ton temps pour connaître ton parcours,
+            ta note indicative et un conseil pour progresser.
+          </p>
+        </div>
+        <button class="secondary" onclick="demanderMotDePasseProfesseur()">Espace professeur</button>
+      </div>
+    </section>
+
+    <section id="espaceProfesseur" class="card teacher-card hidden">
+      <h2>Espace professeur</h2>
+      <p class="subtitle">
+        Renseigne ici le temps minimal réalisé par l’élève de référence.
+        Ce temps servira de base pour calculer la note de temps des autres élèves.
+      </p>
+
+      <div class="formula">
+        <strong>Important :</strong> les balises restent notées directement sur 14.
+        Le temps est calculé par rapport au meilleur temps enregistré par le professeur.
+      </div>
+
+      <div class="grid-3">
+        <div>
+          <label for="eleveReferenceTemps">Élève de référence</label>
+          <input id="eleveReferenceTemps" type="text" value="Justine" />
+        </div>
+
+        <div>
+          <label for="meilleurTempsMinutes">Temps minimal · minutes</label>
+          <input id="meilleurTempsMinutes" type="number" min="0" value="" placeholder="Exemple : 8" />
+        </div>
+
+        <div>
+          <label for="meilleurTempsSecondes">Temps minimal · secondes</label>
+          <input id="meilleurTempsSecondes" type="number" min="0" max="59" value="" placeholder="Exemple : 30" />
+        </div>
+      </div>
+
+      <p class="subtitle">
+        Exemple : si Justine réalise le meilleur temps en 8 min, alors le temps de chaque élève est comparé à 8 min.
+      </p>
+
+      <button onclick="enregistrerTempsReference()">Enregistrer le temps de référence</button>
+      <button class="secondary" onclick="retourEspaceEleve()">Retour à l’espace élève</button>
+      <p id="messageReference" class="warning">Aucun meilleur temps n’est encore enregistré.</p>
+    </section>
+
+    <section id="zoneEleve" class="grid">
+      <div class="card">
+        <h2>Mes informations</h2>
+
+        <label for="prenom">Prénom</label>
+        <input id="prenom" type="text" placeholder="Exemple : Lucas" oninput="verifierPrenom()" />
+        <p id="messagePrenom"></p>
+
+        <label for="balises">Balises validées / 14</label>
+        <input id="balises" type="number" min="0" max="14" placeholder="Exemple : 10" />
+
+        <label for="minutes">Temps réalisé · minutes</label>
+        <input id="minutes" type="number" min="0" placeholder="Exemple : 9" />
+
+        <label for="secondes">Temps réalisé · secondes</label>
+        <input id="secondes" type="number" min="0" max="59" placeholder="Exemple : 30" />
+
+        <label for="securite">Comportement / sécurité</label>
+        <select id="securite">
+          <option value="3">3 pts · Responsable</option>
+          <option value="1">1 pt · À rappeler</option>
+        </select>
+
+        <button onclick="calculerResultat()">Calculer mon retour</button>
+        <button class="bouton-tableau" onclick="afficherTableauEvaluation()">Voir le tableau complet de l’évaluation</button>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Résultat</h2>
+          <div id="resultat">
+            <p class="subtitle">Complète les informations puis clique sur le bouton pour afficher ton retour.</p>
+          </div>
+        </div>
+
+        <div id="conseilCard" class="card hidden">
+          <h2>Conseil pour progresser</h2>
+          <p id="conseil"></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="tableauEvaluation" class="card hidden">
+      <div class="teacher-header">
+        <h2>Tableau complet de l’évaluation</h2>
+        <button class="secondary" onclick="afficherTableauEvaluation()">Fermer le tableau</button>
+      </div>
+
+      <p class="tableau-aide">
+        Lis d’abord la ligne grise dans chaque case : elle indique la fourchette de points correspondant au niveau.
+      </p>
+
+      <table class="evaluation-table">
+        <thead>
+          <tr>
+            <th>Partie évaluée</th>
+            <th>Niveau 1</th>
+            <th>Niveau 2</th>
+            <th>Niveau 3</th>
+            <th>Points</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td><strong>Parcours · Balises</strong></td>
+            <td>
+              <span class="niveau-tableau">Le Chercheur</span>
+              Retrouve peu de balises.<br>
+              A du mal à se repérer seul.<br>
+              Le parcours reste très incomplet.
+              <span class="fourchette">1 à 5 pts /14</span>
+            </td>
+            <td>
+              <span class="niveau-tableau">L’Explorateur</span>
+              Retrouve une partie importante des balises.<br>
+              Se repère globalement bien, avec quelques hésitations.<br>
+              Réalise un parcours assez efficace.
+              <span class="fourchette">6 à 10 pts /14</span>
+            </td>
+            <td>
+              <span class="niveau-tableau">L’Orienteur</span>
+              Retrouve presque toutes ou toutes les balises.<br>
+              Se déplace seul avec efficacité.<br>
+              Réalise un parcours maîtrisé et cohérent.
+              <span class="fourchette">11 à 14 pts /14</span>
+            </td>
+            <td><strong>/14</strong></td>
+          </tr>
+
+          <tr>
+            <td><strong>Temps</strong></td>
+            <td>
+              <span class="niveau-tableau">Le Régulier</span>
+              Termine le parcours à un rythme lent.<br>
+              Le déplacement manque encore d’efficacité.<br>
+              Repère : au-delà de +60 % du temps de référence.
+              <span class="fourchette">1 pt /3</span>
+            </td>
+            <td>
+              <span class="niveau-tableau">L’Efficace</span>
+              Réalise un temps correct.<br>
+              Se déplace de manière assez fluide.<br>
+              Repère : jusqu’à +60 % du temps de référence.
+              <span class="fourchette">2 pts /3</span>
+            </td>
+            <td>
+              <span class="niveau-tableau">Le Rapide</span>
+              Réalise un très bon temps.<br>
+              Se déplace vite tout en restant efficace.<br>
+              Repère : jusqu’à +30 % du temps de référence.
+              <span class="fourchette">3 pts /3</span>
+            </td>
+            <td><strong>/3</strong></td>
+          </tr>
+
+          <tr>
+            <td><strong>Comportement · Sécurité</strong></td>
+            <td>
+              <span class="niveau-tableau">À rappeler</span>
+              Oublie certaines règles de sécurité.<br>
+              Ne revient pas au point de rencontre à temps.
+              <span class="fourchette">1 pt /3</span>
+            </td>
+            <td>
+              —
+            </td>
+            <td>
+              <span class="niveau-tableau">Responsable</span>
+              Respecte les règles de sécurité pendant toute l’épreuve.
+              <span class="fourchette">3 pts /3</span>
+            </td>
+            <td><strong>/3</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Repères rapides du barème</h2>
+
+      <div class="grid-3">
+        <div class="small-card blue">
+          <h3>Parcours · 14 pts</h3>
+          <p>14 balises maximum : 1 balise validée = 1 point sur la partie parcours.</p>
+        </div>
+
+        <div class="small-card green">
+          <h3>Temps · 3 pts</h3>
+          <p>Le temps est comparé au temps minimal entré par le professeur.</p>
+        </div>
+
+        <div class="small-card orange">
+          <h3>Comportement · 3 pts</h3>
+          <p>3 pts si les règles sont respectées, 1 pt si certaines règles sont à rappeler.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let tempsReferenceEnregistre = false;
+
+    const eleves = [
+      { prenom: "Justine", parcours: "Référence temps", vague: "Professeur" },
+      { prenom: "Lucas", parcours: "A", vague: 1 },
+      { prenom: "Alma", parcours: "A", vague: 2 },
+      { prenom: "Mamadou", parcours: "A", vague: 3 },
+      { prenom: "Kenza", parcours: "A", vague: 4 },
+      { prenom: "Alexandre", parcours: "B", vague: 1 },
+      { prenom: "Onel", parcours: "B", vague: 2 },
+      { prenom: "Lyna", parcours: "B", vague: 3 },
+      { prenom: "Asmahan", parcours: "B", vague: 4 },
+      { prenom: "Jules", parcours: "C", vague: 1 },
+      { prenom: "Meywenn", parcours: "C", vague: 2 },
+      { prenom: "Bintou", parcours: "C", vague: 3 },
+      { prenom: "Nafoussatou", parcours: "C", vague: 4 },
+      { prenom: "Mouaz", parcours: "D", vague: 1 },
+      { prenom: "Dounia", parcours: "D", vague: 2 },
+      { prenom: "Malthilda", parcours: "D", vague: 3 },
+      { prenom: "Kendrick", parcours: "E", vague: 1 },
+      { prenom: "Yarie", parcours: "E", vague: 2 },
+      { prenom: "Nana", parcours: "E", vague: 3 },
+      { prenom: "Divine", parcours: "F", vague: 1 },
+      { prenom: "Taslima", parcours: "F", vague: 2 },
+      { prenom: "Rayaan", parcours: "F", vague: 3 }
+    ];
+
+    function normaliserTexte(texte) {
+      return texte
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function trouverEleve() {
+      const prenom = document.getElementById("prenom").value;
+      const cible = normaliserTexte(prenom);
+      if (!cible) return null;
+      return eleves.find(eleve => normaliserTexte(eleve.prenom) === cible) || null;
+    }
+
+    function verifierPrenom() {
+      const prenom = document.getElementById("prenom").value;
+      const message = document.getElementById("messagePrenom");
+
+      if (normaliserTexte(prenom) === "t") {
+        demanderMotDePasseProfesseur();
+        message.textContent = "Accès professeur demandé.";
+        message.className = "warning";
+        return;
+      }
+
+      afficherModeEleve();
+      const eleve = trouverEleve();
+
+      if (!prenom.trim()) {
+        message.textContent = "";
+        message.className = "";
+        return;
+      }
+
+      if (eleve) {
+        message.textContent = `Bonjour ${eleve.prenom} : tu es sur le parcours ${eleve.parcours}, vague ${eleve.vague}.`;
+        message.className = "success";
+      } else {
+        message.textContent = "Prénom non trouvé dans la liste. Vérifie l’orthographe ou demande à ton professeur.";
+        message.className = "warning";
+      }
+    }
+
+    function demanderMotDePasseProfesseur() {
+      const motDePasse = prompt("Mot de passe professeur :");
+
+      if (motDePasse === "Justine") {
+        activerModeProfesseur();
+      } else if (motDePasse !== null) {
+        alert("Mot de passe incorrect.");
+      }
+    }
+
+    function activerModeProfesseur() {
+      document.getElementById("espaceProfesseur").classList.remove("hidden");
+      document.getElementById("zoneEleve").classList.add("hidden");
+      document.getElementById("conseilCard").classList.add("hidden");
+      document.getElementById("tableauEvaluation").classList.add("hidden");
+    }
+
+    function afficherModeEleve() {
+      document.getElementById("zoneEleve").classList.remove("hidden");
+    }
+
+    function retourEspaceEleve() {
+      document.getElementById("espaceProfesseur").classList.add("hidden");
+      document.getElementById("zoneEleve").classList.remove("hidden");
+      document.getElementById("prenom").value = "";
+      document.getElementById("messagePrenom").textContent = "";
+      document.getElementById("messagePrenom").className = "";
+    }
+
+    function enregistrerTempsReference() {
+      const minutes = Number(document.getElementById("meilleurTempsMinutes").value || 0);
+      const secondes = Number(document.getElementById("meilleurTempsSecondes").value || 0);
+      const eleveReference = document.getElementById("eleveReferenceTemps").value || "Justine";
+      const message = document.getElementById("messageReference");
+
+      if (minutes <= 0 && secondes <= 0) {
+        tempsReferenceEnregistre = false;
+        message.textContent = "Le meilleur temps n’est pas valide. Renseigne un temps supérieur à 0.";
+        message.className = "warning";
+        return;
+      }
+
+      tempsReferenceEnregistre = true;
+      message.textContent = `Temps de référence enregistré : ${eleveReference}, ${minutes} min ${String(secondes).padStart(2, "0")} s.`;
+      message.className = "success";
+    }
+
+    function calculPointsTemps(totalSecondes, meilleurTempsSecondes) {
+      if (!Number.isFinite(totalSecondes) || totalSecondes <= 0) {
+        return { points: 0, niveau: "Temps non renseigné", pourcentage: 0 };
+      }
+
+      if (!Number.isFinite(meilleurTempsSecondes) || meilleurTempsSecondes <= 0) {
+        return { points: 0, niveau: "Temps de référence manquant", pourcentage: 0 };
+      }
+
+      const ecart = totalSecondes / meilleurTempsSecondes;
+      const pourcentage = Math.round(ecart * 100);
+
+      if (ecart <= 1.3) {
+        return { points: 3, niveau: "Le Rapide", pourcentage };
+      }
+
+      if (ecart <= 1.6) {
+        return { points: 2, niveau: "L’Efficace", pourcentage };
+      }
+
+      return { points: 1, niveau: "Le Régulier", pourcentage };
+    }
+
+    function niveauBalises(balises) {
+      if (balises >= 11) return "L’Orienteur";
+      if (balises >= 6) return "L’Explorateur";
+      return "Le Chercheur";
+    }
+
+    function descriptionProfilBalises(balises) {
+      if (balises >= 11) return "Tu retrouves presque toutes les balises.";
+      if (balises >= 6) return "Tu retrouves une partie importante des balises.";
+      return "Tu dois encore progresser pour retrouver plus de balises.";
+    }
+
+    function creerConseil(balises, pointsTemps, securite, total) {
+      if (securite < 3) {
+        return "Priorité : respecte toujours les règles de sécurité et reviens au point de rencontre à l’heure. En course d’orientation, être responsable est aussi important que trouver les balises.";
+      }
+
+      if (balises <= 5) {
+        return "Pour progresser, prends plus de temps au départ pour orienter ta carte, repère un élément visible autour de toi, puis avance d’une balise à l’autre sans te précipiter.";
+      }
+
+      if (balises <= 10 && pointsTemps <= 1) {
+        return "Tu trouves plusieurs balises, c’est positif. Essaie maintenant de choisir des chemins plus simples et plus directs pour gagner du temps sans perdre en précision.";
+      }
+
+      if (balises <= 10) {
+        return "Bon travail : tu te repères déjà assez bien. Pour atteindre le niveau supérieur, vérifie mieux les zones proches des balises et garde un rythme régulier.";
+      }
+
+      if (balises >= 11 && pointsTemps <= 1) {
+        return "Très bonne précision dans la recherche des balises. Ton prochain objectif est de rendre ton déplacement plus fluide en anticipant le trajet vers la balise suivante.";
+      }
+
+      if (total >= 17) {
+        return "Excellent parcours : tu combines précision, vitesse et sécurité. Continue à anticiper tes choix d’itinéraire pour rester efficace.";
+      }
+
+      return "Parcours solide. Pour progresser encore, essaie de préparer ton itinéraire avant de courir et de vérifier régulièrement que ta carte est bien orientée.";
+    }
+
+    function calculerResultat() {
+      if (!tempsReferenceEnregistre) {
+        document.getElementById("resultat").innerHTML = `
+          <p class="warning">
+            Le résultat ne peut pas être calculé : le professeur doit d’abord entrer et enregistrer le meilleur temps dans l’espace professeur.
+          </p>
+        `;
+        document.getElementById("conseilCard").classList.add("hidden");
+        return;
+      }
+
+      const eleve = trouverEleve();
+      const balisesSaisies = Number(document.getElementById("balises").value || 0);
+      const balises = Math.max(0, Math.min(14, balisesSaisies));
+      const minutes = Number(document.getElementById("minutes").value || 0);
+      const secondes = Number(document.getElementById("secondes").value || 0);
+      const securite = Number(document.getElementById("securite").value || 0);
+
+      const eleveReferenceTemps = document.getElementById("eleveReferenceTemps").value || "Justine";
+      const meilleurMinutes = Number(document.getElementById("meilleurTempsMinutes").value || 0);
+      const meilleurSecondes = Number(document.getElementById("meilleurTempsSecondes").value || 0);
+
+      const totalSecondes = minutes * 60 + secondes;
+      const meilleurTempsSecondes = meilleurMinutes * 60 + meilleurSecondes;
+
+      const noteBalises = balises;
+      const pourcentageBalises = Math.min(100, Math.round((noteBalises / 14) * 100));
+      const temps = calculPointsTemps(totalSecondes, meilleurTempsSecondes);
+      const total = Math.round((noteBalises + temps.points + securite) * 10) / 10;
+      const conseil = creerConseil(balises, temps.points, securite, total);
+
+      const parcoursHtml = eleve
+        ? `<p><strong>Prénom :</strong> ${eleve.prenom}</p>
+           <p><strong>Parcours :</strong> ${eleve.parcours}</p>
+           <p><strong>Vague :</strong> ${eleve.vague}</p>`
+        : `<p class="warning">Élève non trouvé dans la liste.</p>`;
+
+      document.getElementById("resultat").innerHTML = `
+        <p class="subtitle">Note indicative</p>
+        <div class="result-note">${total}<span style="font-size: 26px; color: #64748b;">/20</span></div>
+
+        <p class="formula">
+          Note calculée avec 14 balises maximum et le temps minimal de référence de ${eleveReferenceTemps} : ${meilleurMinutes} min ${String(meilleurSecondes).padStart(2, "0")} s.
+        </p>
+
+        <div class="grid-3">
+          <div class="small-card blue">
+            <span class="titre-partie">Parcours</span>
+            <span class="profil-eleve">${niveauBalises(balises)}</span>
+            <p class="profil-description">${descriptionProfilBalises(balises)}</p>
+            <span class="badge">Balises</span>
+            <p><strong>${noteBalises}/14</strong></p>
+            <p>${balises} balises validées sur 14 maximum</p>
+            <div class="progress"><div class="progress-fill" style="width: ${pourcentageBalises}%;"></div></div>
+          </div>
+
+          <div class="small-card green">
+            <span class="titre-partie">Temps</span>
+            <span class="profil-temps">${temps.niveau}</span>
+            <span class="badge">Vitesse</span>
+            <p><strong>${temps.points}/3</strong></p>
+            <p>Temps de l’élève : ${temps.pourcentage}% du temps de référence de ${eleveReferenceTemps}</p>
+          </div>
+
+          <div class="small-card orange">
+            <span class="titre-partie">Comportement</span>
+            <span class="profil-comportement">${securite === 3 ? "Responsable" : "À rappeler"}</span>
+            <span class="badge">Sécurité</span>
+            <p><strong>${securite}/3</strong></p>
+          </div>
+        </div>
+
+        <div class="small-card" style="margin-top: 12px; height: auto;">
+          ${parcoursHtml}
+          <p><strong>Temps :</strong> ${minutes} min ${String(secondes).padStart(2, "0")} s</p>
+        </div>
+      `;
+
+      document.getElementById("conseil").textContent = conseil;
+      document.getElementById("conseilCard").classList.remove("hidden");
+    }
+
+    function afficherTableauEvaluation() {
+      const tableau = document.getElementById("tableauEvaluation");
+      tableau.classList.toggle("hidden");
+
+      if (!tableau.classList.contains("hidden")) {
+        tableau.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  </script>
 </body>
 </html>
