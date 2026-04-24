@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur CO - 6ème</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2e7d32; /* Vert forêt */
+            --secondary: #ffa000; /* Orange balise */
+            --bg: #f4f7f6;
+        }
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            width: 90%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-top: 8px solid var(--secondary);
+        }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 25px; }
+        
+        .section { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; font-weight: 600; color: #444; }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: 'Fredoka', sans-serif;
+        }
+        input:focus { border-color: var(--secondary); outline: none; }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+            transition: all 0.2s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(46, 125, 50, 0.4); }
+
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 15px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .note-cercle {
+            width: 80px;
+            height: 80px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 15px;
+            font-weight: bold;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .profil-titre { font-size: 1.3rem; color: var(--primary); margin-bottom: 10px; font-weight: 600; }
+        .conseil-texte { color: #666; line-height: 1.4; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏃‍♂️ Score CO</h1>
+
+    <div class="section">
+        <label>Combien de balises trouvées ? [cite: 3]</label>
+        <input type="number" id="balises" min="0" max="14" placeholder="Tape ton nombre (max 14)...">
+    </div>
+
+    <div class="section">
+        <label>Ton rythme de course : [cite: 6]</label>
+        <select id="temps">
+            <option value="1">🐢 Le Régulier (Lent)</option>
+            <option value="2">🏃 L'Efficace (Moyen)</option>
+            <option value="3">⚡ Le Rapide (Vite)</option>
+        </select>
+    </div>
+
+    <div class="section">
+        <label>Sécurité & Horaire : [cite: 8]</label>
+        <select id="securite">
+            <option value="3">✅ Le Responsable (Parfait)</option>
+            <option value="1">⚠️ À rappeler (Oubli/Retard)</option>
+        </select>
+    </div>
+
+    <button onclick="calculer()">Voir mon résultat</button>
+
+    <div id="result">
+        <div class="note-cercle" id="laNote"></div>
+        <div class="profil-titre" id="leProfil"></div>
+        <div class="conseil-texte" id="leConseil"></div>
+    </div>
+</div>
+
+<script>
+function calculer() {
+    let b = parseInt(document.getElementById('balises').value) || 0;
+    let t = parseInt(document.getElementById('temps').value);
+    let s = parseInt(document.getElementById('securite').value);
+
+    if(b > 14) b = 14;
+
+    // Calcul de la note totale (Max 14 + 3 + 3 = 20) [cite: 5, 7, 9]
+    let total = b + t + s;
+
+    let profil = "";
+    let conseil = "";
+    let couleur = "";
+
+    // Logique basée sur les niveaux du document 
+    if (b >= 11) {
+        profil = "Niveau 3 : L'Orienteur 🧭";
+        conseil = "Génial ! Tu maîtrises ton sujet. Pour la prochaine fois, essaie d'augmenter ta vitesse de course entre les balises.";
+        couleur = "#e8f5e9";
+    } else if (b >= 6) {
+        profil = "Niveau 2 : L'Explorateur 🗺️";
+        conseil = "Beau travail ! Tu te repères bien. Travaille ta prise de décision pour moins hésiter aux carrefours.";
+        couleur = "#fff3e0";
+    } else {
+        profil = "Niveau 1 : Le Chercheur 🔍";
+        conseil = "N'oublie pas d'orienter ta carte à chaque changement de direction. Utilise les éléments remarquables !";
+        couleur = "#ffebee";
+    }
+
+    const resDiv = document.getElementById('result');
+    resDiv.style.display = 'block';
+    resDiv.style.backgroundColor = couleur;
+    
+    document.getElementById('laNote').innerText = total + "/20";
+    document.getElementById('leProfil').innerText = profil;
+    document.getElementById('leConseil').innerText = conseil;
+    
+    resDiv.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
