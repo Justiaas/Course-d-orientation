@@ -433,8 +433,8 @@
       </p>
 
       <div class="formula">
-        <strong>Important :</strong> les balises restent notées directement sur 14.
-        Le temps est calculé par rapport au meilleur temps enregistré par le professeur.
+        <strong>Important :</strong> il y a 8 balises maximum par parcours.
+        La note de parcours tient compte du nombre de balises trouvées et du temps réalisé.
       </div>
 
       <div class="grid-3">
@@ -468,8 +468,8 @@
         <input id="prenom" type="text" placeholder="Exemple : Lucas" oninput="verifierPrenom()" />
         <p id="messagePrenom"></p>
 
-        <label for="balises">Balises validées / 14</label>
-        <input id="balises" type="number" min="0" max="14" placeholder="Exemple : 10" />
+        <label for="balises">Balises validées / 8</label>
+        <input id="balises" type="number" min="0" max="8" placeholder="Exemple : 6" />
 
         <label for="minutes">Temps réalisé · minutes</label>
         <input id="minutes" type="number" min="0" placeholder="Exemple : 9" />
@@ -602,7 +602,7 @@
       <div class="grid-3">
         <div class="small-card blue">
           <h3>Parcours · 14 pts</h3>
-          <p>14 balises maximum : 1 balise validée = 1 point sur la partie parcours.</p>
+          <p>8 balises maximum : la note de parcours dépend des balises trouvées et du temps réalisé.</p>
         </div>
 
         <div class="small-card green">
@@ -647,26 +647,29 @@
     const eleves = [
       { prenom: "Justine", parcours: "Référence temps", vague: "Professeur" },
       { prenom: "Lucas", parcours: "A", vague: 1 },
-      { prenom: "Alma", parcours: "A", vague: 2 },
-      { prenom: "Mamadou", parcours: "A", vague: 3 },
-      { prenom: "Kenza", parcours: "A", vague: 4 },
       { prenom: "Alexandre", parcours: "B", vague: 1 },
-      { prenom: "Onel", parcours: "B", vague: 2 },
-      { prenom: "Lyna", parcours: "B", vague: 3 },
-      { prenom: "Asmahan", parcours: "B", vague: 4 },
       { prenom: "Jules", parcours: "C", vague: 1 },
-      { prenom: "Meywenn", parcours: "C", vague: 2 },
-      { prenom: "Bintou", parcours: "C", vague: 3 },
-      { prenom: "Nafoussatou", parcours: "C", vague: 4 },
       { prenom: "Mouaz", parcours: "D", vague: 1 },
-      { prenom: "Dounia", parcours: "D", vague: 2 },
-      { prenom: "Malthilda", parcours: "D", vague: 3 },
       { prenom: "Kendrick", parcours: "E", vague: 1 },
-      { prenom: "Yarie", parcours: "E", vague: 2 },
-      { prenom: "Nana", parcours: "E", vague: 3 },
       { prenom: "Divine", parcours: "F", vague: 1 },
+
+      { prenom: "Alma", parcours: "A", vague: 2 },
+      { prenom: "Onel", parcours: "B", vague: 2 },
+      { prenom: "Meywenn", parcours: "C", vague: 2 },
+      { prenom: "Dounia", parcours: "D", vague: 2 },
+      { prenom: "Yarie", parcours: "E", vague: 2 },
       { prenom: "Taslima", parcours: "F", vague: 2 },
-      { prenom: "Rayaan", parcours: "F", vague: 3 }
+
+      { prenom: "Mamadou", parcours: "A", vague: 3 },
+      { prenom: "Lyna", parcours: "B", vague: 3 },
+      { prenom: "Bintou", parcours: "C", vague: 3 },
+      { prenom: "Malthilda", parcours: "D", vague: 3 },
+      { prenom: "Nana", parcours: "E", vague: 3 },
+      { prenom: "Rayaan", parcours: "F", vague: 3 },
+
+      { prenom: "Kenza", parcours: "A", vague: 4 },
+      { prenom: "Asmahan", parcours: "B", vague: 4 },
+      { prenom: "Nafoussatou", parcours: "C", vague: 4 }
     ];
 
     function normaliserTexte(texte) {
@@ -713,7 +716,7 @@
             secondes: 0
           };
 
-          document.getElementById("messageLive").textContent = "Aucun meilleur temps n’est encore enregistré. Le calcul des résultats est bloqué jusqu’à l’enregistrement par le professeur.";
+          document.getElementById("messageLive").textContent = "Aucun temps de référence n’est encore enregistré. Le calcul des résultats est bloqué jusqu’à l’enregistrement par le professeur.";
           document.getElementById("messageLive").className = "live-box attente";
 
           document.getElementById("messageReference").textContent = "Aucun meilleur temps n’est encore enregistré.";
@@ -848,16 +851,28 @@
       return { points: 1, niveau: "Le Régulier", pourcentage };
     }
 
-    function niveauBalises(balises) {
-      if (balises >= 11) return "L’Orienteur";
-      if (balises >= 6) return "L’Explorateur";
+    function niveauParcours(noteParcours) {
+      if (noteParcours >= 11) return "L’Orienteur";
+      if (noteParcours >= 6) return "L’Explorateur";
       return "Le Chercheur";
     }
 
-    function descriptionProfilBalises(balises) {
-      if (balises >= 11) return "Tu retrouves presque toutes les balises.";
-      if (balises >= 6) return "Tu retrouves une partie importante des balises.";
-      return "Tu dois encore progresser pour retrouver plus de balises.";
+    function descriptionProfilParcours(noteParcours) {
+      if (noteParcours >= 11) return "Tu réussis un parcours efficace et maîtrisé.";
+      if (noteParcours >= 6) return "Tu réalises une partie importante du parcours.";
+      return "Tu dois encore progresser pour enchaîner les balises plus efficacement.";
+    }
+
+    function calculerNoteParcours(balises, totalSecondes, tempsReferenceSecondes) {
+      if (!Number.isFinite(totalSecondes) || totalSecondes <= 0) return 0;
+      if (!Number.isFinite(tempsReferenceSecondes) || tempsReferenceSecondes <= 0) return 0;
+
+      // Référence : 8 balises réalisées sur le meilleur temps.
+      // On compare la performance de l'élève : balises trouvées / temps réalisé.
+      const performanceEleve = balises / totalSecondes;
+      const performanceReference = 8 / tempsReferenceSecondes;
+      const note = (performanceEleve / performanceReference) * 14;
+      return Math.round(Math.max(0, Math.min(14, note)) * 10) / 10;
     }
 
     function creerConseil(balises, pointsTemps, securite, total) {
@@ -865,19 +880,19 @@
         return "Priorité : respecte toujours les règles de sécurité et reviens au point de rencontre à l’heure. En course d’orientation, être responsable est aussi important que trouver les balises.";
       }
 
-      if (balises <= 5) {
+      if (balises <= 3) {
         return "Pour progresser, prends plus de temps au départ pour orienter ta carte, repère un élément visible autour de toi, puis avance d’une balise à l’autre sans te précipiter.";
       }
 
-      if (balises <= 10 && pointsTemps <= 1) {
+      if (balises <= 6 && pointsTemps <= 1) {
         return "Tu trouves plusieurs balises, c’est positif. Essaie maintenant de choisir des chemins plus simples et plus directs pour gagner du temps sans perdre en précision.";
       }
 
-      if (balises <= 10) {
+      if (balises <= 6) {
         return "Bon travail : tu te repères déjà assez bien. Pour atteindre le niveau supérieur, vérifie mieux les zones proches des balises et garde un rythme régulier.";
       }
 
-      if (balises >= 11 && pointsTemps <= 1) {
+      if (balises >= 7 && pointsTemps <= 1) {
         return "Très bonne précision dans la recherche des balises. Ton prochain objectif est de rendre ton déplacement plus fluide en anticipant le trajet vers la balise suivante.";
       }
 
@@ -901,7 +916,7 @@
 
       const eleve = trouverEleve();
       const balisesSaisies = Number(document.getElementById("balises").value || 0);
-      const balises = Math.max(0, Math.min(14, balisesSaisies));
+      const balises = Math.max(0, Math.min(8, balisesSaisies));
       const minutes = Number(document.getElementById("minutes").value || 0);
       const secondes = Number(document.getElementById("secondes").value || 0);
       const securite = Number(document.getElementById("securite").value || 0);
@@ -913,10 +928,10 @@
       const totalSecondes = minutes * 60 + secondes;
       const meilleurTempsSecondes = meilleurMinutes * 60 + meilleurSecondes;
 
-      const noteBalises = balises;
-      const pourcentageBalises = Math.min(100, Math.round((noteBalises / 14) * 100));
+      const noteParcours = calculerNoteParcours(balises, totalSecondes, meilleurTempsSecondes);
+      const pourcentageBalises = Math.min(100, Math.round((balises / 8) * 100));
       const temps = calculPointsTemps(totalSecondes, meilleurTempsSecondes);
-      const total = Math.round((noteBalises + temps.points + securite) * 10) / 10;
+      const total = Math.round((noteParcours + temps.points + securite) * 10) / 10;
       const conseil = creerConseil(balises, temps.points, securite, total);
 
       const parcoursHtml = eleve
@@ -930,17 +945,18 @@
         <div class="result-note">${total}<span style="font-size: 26px; color: #64748b;">/20</span></div>
 
         <p class="formula">
-          Note calculée avec 14 balises maximum et le temps minimal de référence de ${eleveReferenceTemps} : ${meilleurMinutes} min ${String(meilleurSecondes).padStart(2, "0")} s.
+          Note calculée avec 8 balises maximum et le temps minimal de référence de ${eleveReferenceTemps} : ${meilleurMinutes} min ${String(meilleurSecondes).padStart(2, "0")} s.
         </p>
 
         <div class="grid-3">
           <div class="small-card blue">
             <span class="titre-partie">Parcours</span>
-            <span class="profil-eleve">${niveauBalises(balises)}</span>
-            <p class="profil-description">${descriptionProfilBalises(balises)}</p>
+            <span class="profil-eleve">${niveauParcours(noteParcours)}</span>
+            <p class="profil-description">${descriptionProfilParcours(noteParcours)}</p>
             <span class="badge">Balises</span>
-            <p><strong>${noteBalises}/14</strong></p>
-            <p>${balises} balises validées sur 14 maximum</p>
+            <p><strong>${noteParcours}/14</strong></p>
+            <p>${balises} balises validées sur 8 maximum</p>
+            <p>La note parcours tient aussi compte du temps réalisé.</p>
             <div class="progress"><div class="progress-fill" style="width: ${pourcentageBalises}%;"></div></div>
           </div>
 
